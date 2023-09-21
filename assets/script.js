@@ -20,4 +20,120 @@ $(function () {
   // attribute of each time-block be used to do this?
   //
   // TODO: Add code to display the current date in the header of the page.
+
+//Get the current day and hour
+var dateDisplayEl = document.getElementById("currentDay");
+
+function today() {
+  var todayDate = dayjs().format('dddd, D of MMMM');
+  dateDisplayEl.textContent = "Today's date is " + todayDate;
+}
+
+setInterval(function (){
+  currentHour();
+}, 60000);
+
+
+
+// Set the colour of each hour block based on the hour
+
+let hour = 0;
+let x = "";
+
+function currentHour() {
+  let hour = dayjs().format("ha");
+      if (hour.includes("pm")) {
+      hour = hour.trim("pm");
+      hour = parseInt(hour);
+      hour += 12;
+      return hour;
+    }  else {
+      hour = hour.trim("am");
+      hour = parseInt(hour);
+      return hour;
+  }
+  }
+
+
+
+// Create a Division for each hour of the day
+
+function colourSelect(i) {
+      
+  let current = currentHour();
+
+  if (i > current) {
+    x = "future";
+  } else if (i == current) {
+    x = "present";
+  } else {
+    x = "past";
+  }
+}
+
+var divs = []
+
+function createDiv(x) {
+  hours = [9, 10, 11, 12, 13, 14, 15, 16, 17]
+  hours.forEach (i => {
+    console.log(i)
+    
+
+    colourSelect(i)
+    let thisDiv = $("<div></div>");
+    thisDiv.attr("id", `hour-${i}`);
+    thisDiv.addClass(`row time-block ${x}`);
+    let thisHour = $("<div></div>");
+    thisHour.attr("class", "col-2 col-md-1 hour text-center py-3");
+    thisHour.text(`${i}:00`)
+    let thisTextArea = $("<textarea>");
+    thisTextArea.attr("class", "col-8 col-md-10 description");
+    let thisBtn = $("<button>");
+    thisBtn.attr("class", "btn saveBtn col-2 col-md-1")
+    thisBtn.html("<i class='fas fa-save' aria-hidden='true'></i>")
+
+    thisDiv.append(thisHour);
+    thisDiv.append(thisTextArea);
+    thisDiv.append(thisBtn);
+
+    let hourObject = {element: thisDiv, content:""};
+    window[`no.${i}`] = hourObject;
+    //console.log(window["no."+i]);
+    //console.log(divs[i].element());
+    divs.push(hourObject);
+    
+  })
+}
+
+today()
+createDiv();
+console.log(divs);
+
+// render divs
+
+const containerEl = $(".container-lg");
+
+function divRender() {
+  divs.forEach (hourObject => {
+    containerEl.append(hourObject.element);
+  })
+}
+divRender();
+
+// handle the click of the save button and storage of the content added to 
+// the text areas
+
+$("button").on("click", function() {
+  var divId = $(this).parent().attr("id");
+  var content = $(this).prev('textarea').val();
+  if (content != "") {
+    divs[this.prev]
+  }
+  divId = divId.trim("hour-")
+  console.log(divId)
+  console.log(content)
+})
+
+
+
 });
