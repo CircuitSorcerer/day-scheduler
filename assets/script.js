@@ -37,11 +37,11 @@ setInterval(function (){
 
 // Set the colour of each hour block based on the hour
 
-let hour = 0;
+
 let x = "";
 
 function currentHour() {
-  let hour = dayjs().format("ha");
+  let hour = "10"//dayjs().format("ha");
       if (hour.includes("pm")) {
       hour = hour.trim("pm");
       hour = parseInt(hour);
@@ -63,11 +63,11 @@ function colourSelect(i) {
   let current = currentHour();
 
   if (i > current) {
-    x = "future";
+    return "future";
   } else if (i == current) {
-    x = "present";
+    return "present";
   } else {
-    x = "past";
+    return "past";
   }
 }
 
@@ -75,19 +75,24 @@ var divs = []
 
 function createDiv(x) {
   hours = [9, 10, 11, 12, 13, 14, 15, 16, 17]
+  
   hours.forEach (i => {
-    console.log(i)
+    console.log(i);
+    let x = colourSelect(i);
+    var ourContent = storageRetrieval(i)
     
 
-    colourSelect(i)
+
     let thisDiv = $("<div></div>");
     thisDiv.attr("id", `hour-${i}`);
+    console.log(x)
     thisDiv.addClass(`row time-block ${x}`);
     let thisHour = $("<div></div>");
     thisHour.attr("class", "col-2 col-md-1 hour text-center py-3");
-    thisHour.text(`${i}:00`)
+    thisHour.text(`${i}:00`);
     let thisTextArea = $("<textarea>");
     thisTextArea.attr("class", "col-8 col-md-10 description");
+    if(ourContent != null){thisTextArea.text(ourContent)}
     let thisBtn = $("<button>");
     thisBtn.attr("class", "btn saveBtn col-2 col-md-1")
     thisBtn.html("<i class='fas fa-save' aria-hidden='true'></i>")
@@ -107,7 +112,23 @@ function createDiv(x) {
 
 today()
 createDiv();
-console.log(divs);
+//console.log(divs);
+
+
+// storage handling
+
+function storageRetrieval(i) {
+  try {
+    var retrievedJSON = localStorage.getItem("objectToStore");
+    var retrievedDiv = JSON.parse(retrievedJSON);
+    var ourContent = retrievedDiv[i].content;
+    return ourContent;
+  } catch {
+    (exception) => {}
+  }
+}
+
+
 
 // render divs
 
@@ -126,12 +147,22 @@ divRender();
 $("button").on("click", function() {
   var divId = $(this).parent().attr("id");
   var content = $(this).prev('textarea').val();
+  
+  console.log(divId);
+  divId = divId.replace("hour-", "");
+  divId = parseInt(divId);
+  console.log(divId);
   if (content != "") {
-    divs[this.prev]
+    console.log(divs)
+    console.log(divId);
+    divs[divId-9].content = content;
+    console.log(divId);
   }
-  divId = divId.trim("hour-")
-  console.log(divId)
-  console.log(content)
+  
+  console.log(divId);
+  console.log(divs[divId-9].content);
+  JSON.stringify(divs)
+  localStorage.setItem("objectToStore", divs)
 })
 
 
